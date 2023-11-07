@@ -1,3 +1,6 @@
+*.html
+*.jpg
+output.pdf
 # Logs
 logs
 *.log
