@@ -1,5 +1,44 @@
 # test2
+```const fs = require('fs');
+const axios = require('axios');
 
+if (process.argv.length < 3) {
+  console.error('Usage: node process-html.js <input-html-file>');
+  process.exit(1);
+}
+
+const inputFile = process.argv[2];
+
+// Read the HTML content from the input file
+const htmlContent = fs.readFileSync(inputFile, 'utf8');
+
+// Regular expression to match and extract the href attributes
+const regex = /<a class="name" href="(\/school\/intro\/jr\/\d+)">/gm;
+
+let modifiedHtml = htmlContent;
+let match;
+var matches=[]
+// Loop through the matches and replace "intro" with "album" and add the domain name
+while ((match = regex.exec(htmlContent)) !== null) {
+  const url = match[1];
+  const modifiedUrl = `https://uniform.wingzero.tw${url.replace('/intro/', '/album/')}`;
+  matches.push(modifiedUrl)
+}
+if (matches) {
+  const downloadPromises = matches.map((match) => {
+      const url = match
+    return axios.get(url).then((response) => {
+      const fileName = url.split('/').pop();
+      fs.writeFileSync(fileName, response.data);
+      console.log(`Downloaded: ${fileName}`);
+    });
+  });
+
+  Promise.all(downloadPromises)
+    .then(() => console.log('All downloads completed.'))
+    .catch((error) => console.error('Error downloading:', error.message));
+}
+```
 <!DOCTYPE html>
 <html>
 <head>
